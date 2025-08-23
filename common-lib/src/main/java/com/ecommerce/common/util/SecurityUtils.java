@@ -12,6 +12,9 @@ public class SecurityUtils {
     }
     
     public static boolean matchesPassword(String rawPassword, String encodedPassword) {
+        if (rawPassword == null || encodedPassword == null) {
+            return false;
+        }
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
     

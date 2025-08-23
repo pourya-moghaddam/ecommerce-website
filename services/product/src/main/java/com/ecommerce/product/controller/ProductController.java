@@ -11,4 +11,8 @@ public class ProductController {
         return "Product service is running!";
     }
 
+    @GetMapping("/error-test")
+    public void testError() {
+        throw new IllegalArgumentException("Test error using common ErrorResponse");
+    }
 }

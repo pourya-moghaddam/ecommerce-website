@@ -1,0 +1,161 @@
+version: '3.8'
+
+services:
+  auth-db:
+    image: postgres:15-alpine
+    container_name: auth-postgres
+    environment:
+      POSTGRES_DB: ${AUTH_DB_NAME:-auth_db}
+      POSTGRES_USER: ${AUTH_DB_USER:-auth_user}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD:-auth_password}
+    ports:
+      - "${AUTH_DB_PORT:-5432}:5432"
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+
+  product-db:
+    image: postgres:15-alpine
+    container_name: product-postgres
+    environment:
+      POSTGRES_DB: ${PRODUCT_DB_NAME:-product_db}
+      POSTGRES_USER: ${PRODUCT_DB_USER:-product_user}
+      POSTGRES_PASSWORD: ${PRODUCT_DB_PASSWORD:-product_password}
+    ports:
+      - "${PRODUCT_DB_PORT:-5433}:5432"
+    volumes:
+      - product_db_data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+
+  order-db:
+    image: postgres:15-alpine
+    container_name: order-postgres
+    environment:
+      POSTGRES_DB: ${ORDER_DB_NAME:-order_db}
+      POSTGRES_USER: ${ORDER_DB_USER:-order_user}
+      POSTGRES_PASSWORD: ${ORDER_DB_PASSWORD:-order_password}
+    ports:
+      - "${ORDER_DB_PORT:-5434}:5432"
+    volumes:
+      - order_db_data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+
+  payment-db:
+    image: postgres:15-alpine
+    container_name: payment-postgres
+    environment:
+      POSTGRES_DB: ${PAYMENT_DB_NAME:-payment_db}
+      POSTGRES_USER: ${PAYMENT_DB_USER:-payment_user}
+      POSTGRES_PASSWORD: ${PAYMENT_DB_PASSWORD:-payment_password}
+    ports:
+      - "${PAYMENT_DB_PORT:-5435}:5432"
+    volumes:
+      - payment_db_data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth/Dockerfile
+    container_name: auth-service
+    ports:
+      - "${AUTH_SERVICE_PORT:-8080}:${AUTH_SERVICE_PORT:-8080}"
+    environment:
+      - AUTH_DB_HOST=${AUTH_DB_HOST:-auth-db}
+      - AUTH_DB_PORT=${AUTH_DB_PORT:-5432}
+      - AUTH_DB_NAME=${AUTH_DB_NAME:-auth_db}
+      - AUTH_DB_USER=${AUTH_DB_USER:-auth_user}
+      - AUTH_DB_PASSWORD=${AUTH_DB_PASSWORD:-auth_password}
+      - AUTH_SERVICE_PORT=${AUTH_SERVICE_PORT:-8080}
+    depends_on:
+      - auth-db
+    networks:
+      - ecommerce-network
+
+  product-service:
+    build:
+      context: .
+      dockerfile: services/product/Dockerfile
+    container_name: product-service
+    ports:
+      - "${PRODUCT_SERVICE_PORT:-8081}:${PRODUCT_SERVICE_PORT:-8081}"
+    environment:
+      - PRODUCT_DB_HOST=${PRODUCT_DB_HOST:-product-db}
+      - PRODUCT_DB_PORT=${PRODUCT_DB_PORT:-5432}
+      - PRODUCT_DB_NAME=${PRODUCT_DB_NAME:-product_db}
+      - PRODUCT_DB_USER=${PRODUCT_DB_USER:-product_user}
+      - PRODUCT_DB_PASSWORD=${PRODUCT_DB_PASSWORD:-product_password}
+      - PRODUCT_SERVICE_PORT=${PRODUCT_SERVICE_PORT:-8081}
+    depends_on:
+      - product-db
+    networks:
+      - ecommerce-network
+
+  order-service:
+    build:
+      context: .
+      dockerfile: services/order/Dockerfile
+    container_name: order-service
+    ports:
+      - "${ORDER_SERVICE_PORT:-8082}:${ORDER_SERVICE_PORT:-8082}"
+    environment:
+      - ORDER_DB_HOST=${ORDER_DB_HOST:-order-db}
+      - ORDER_DB_PORT=${ORDER_DB_PORT:-5432}
+      - ORDER_DB_NAME=${ORDER_DB_NAME:-order_db}
+      - ORDER_DB_USER=${ORDER_DB_USER:-order_user}
+      - ORDER_DB_PASSWORD=${ORDER_DB_PASSWORD:-order_password}
+      - ORDER_SERVICE_PORT=${ORDER_SERVICE_PORT:-8082}
+    depends_on:
+      - order-db
+    networks:
+      - ecommerce-network
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: services/payment/Dockerfile
+    container_name: payment-service
+    ports:
+      - "${PAYMENT_SERVICE_PORT:-8083}:${PAYMENT_SERVICE_PORT:-8083}"
+    environment:
+      - PAYMENT_DB_HOST=${PAYMENT_DB_HOST:-payment-db}
+      - PAYMENT_DB_PORT=${PAYMENT_DB_PORT:-5432}
+      - PAYMENT_DB_NAME=${PAYMENT_DB_NAME:-payment_db}
+      - PAYMENT_DB_USER=${PAYMENT_DB_USER:-payment_user}
+      - PAYMENT_DB_PASSWORD=${PAYMENT_DB_PASSWORD:-payment_password}
+      - PAYMENT_SERVICE_PORT=${PAYMENT_SERVICE_PORT:-8083}
+    depends_on:
+      - payment-db
+    networks:
+      - ecommerce-network
+
+  gateway-service:
+    build:
+      context: .
+      dockerfile: services/gateway/Dockerfile
+    container_name: gateway-service
+    ports:
+      - "${GATEWAY_SERVICE_PORT:-8084}:${GATEWAY_SERVICE_PORT:-8084}"
+    environment:
+      - GATEWAY_SERVICE_PORT=${GATEWAY_SERVICE_PORT:-8084}
+    depends_on:
+      - auth-service
+      - product-service
+      - order-service
+      - payment-service
+    networks:
+      - ecommerce-network
+
+volumes:
+  auth_db_data:
+  product_db_data:
+  order_db_data:
+  payment_db_data:
+
+networks:
+  ecommerce-network:
+    driver: bridge

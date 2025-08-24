@@ -19,4 +19,4 @@ build/
 # OS / misc
 .DS_Store
 Thumbs.db
-
+.env

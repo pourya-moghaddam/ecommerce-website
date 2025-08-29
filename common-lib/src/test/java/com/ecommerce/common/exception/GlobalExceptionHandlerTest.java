@@ -39,6 +39,7 @@ class GlobalExceptionHandlerTest {
         assertNotNull(response.getBody());
         
         ErrorResponse errorResponse = response.getBody();
+        assertNotNull(errorResponse);
         assertEquals(errorMessage, errorResponse.getMessage());
         assertEquals("Internal Server Error", errorResponse.getError());
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
@@ -60,6 +61,7 @@ class GlobalExceptionHandlerTest {
         assertNotNull(response.getBody());
         
         ErrorResponse errorResponse = response.getBody();
+        assertNotNull(errorResponse);
         assertEquals(errorMessage, errorResponse.getMessage());
         assertEquals("Bad Request", errorResponse.getError());
         assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
@@ -77,6 +79,9 @@ class GlobalExceptionHandlerTest {
         
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertNull(response.getBody().getMessage());
+        ErrorResponse errorResponse = response.getBody();
+        if (errorResponse != null) {
+            assertNull(errorResponse.getMessage());
+        }
     }
 }

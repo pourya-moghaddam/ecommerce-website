@@ -142,6 +142,7 @@ services:
       - "${GATEWAY_SERVICE_PORT:-8084}:${GATEWAY_SERVICE_PORT:-8084}"
     environment:
       - GATEWAY_SERVICE_PORT=${GATEWAY_SERVICE_PORT:-8084}
+      - PRODUCT_SERVICE_PORT=${PRODUCT_SERVICE_PORT:-8081}
     depends_on:
       - auth-service
       - product-service

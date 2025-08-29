@@ -1,0 +1,18 @@
+{
+    "name": "Ecommerce Dev Container",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "gateway-service",
+    "workspaceFolder": "/workspace",
+    "shutdownAction": "stopCompose",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "vscjava.vscode-java-pack",
+                "ms-azuretools.vscode-docker"
+            ],
+            "settings": {
+                "java.jdt.ls.java.home": "/usr/local/openjdk-21"
+            }
+        }
+    }
+}

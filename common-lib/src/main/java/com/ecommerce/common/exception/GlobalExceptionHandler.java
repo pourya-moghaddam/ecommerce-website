@@ -13,8 +13,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex, WebRequest request) {
         ErrorResponse error = new ErrorResponse(
+            "about:blank",
+            "Internal Server Error",
+            HttpStatus.INTERNAL_SERVER_ERROR.value(),
             ex.getMessage(),
-            "INTERNAL_SERVER_ERROR",
             request.getDescription(false).replace("uri=", "")
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
@@ -23,8 +25,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex, WebRequest request) {
         ErrorResponse error = new ErrorResponse(
+            "about:blank",
+            "Bad Request",
+            HttpStatus.BAD_REQUEST.value(),
             ex.getMessage(),
-            "BAD_REQUEST",
             request.getDescription(false).replace("uri=", "")
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
@@ -33,8 +37,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex, WebRequest request) {
         ErrorResponse error = new ErrorResponse(
+            "about:blank",
+            "Internal Server Error",
+            HttpStatus.INTERNAL_SERVER_ERROR.value(),
             ex.getMessage(),
-            "INTERNAL_SERVER_ERROR",
             request.getDescription(false).replace("uri=", "")
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);

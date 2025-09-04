@@ -40,9 +40,11 @@ class GlobalExceptionHandlerTest {
         
         ErrorResponse errorResponse = response.getBody();
         assertNotNull(errorResponse);
-        assertEquals(errorMessage, errorResponse.getMessage());
-        assertEquals("INTERNAL_SERVER_ERROR", errorResponse.getCode());
-        assertEquals(requestUri, errorResponse.getPath());
+        assertEquals("about:blank", errorResponse.getType());
+        assertEquals("Internal Server Error", errorResponse.getTitle());
+        assertEquals(500, errorResponse.getStatus());
+        assertEquals(errorMessage, errorResponse.getDetail());
+        assertEquals(requestUri, errorResponse.getInstance());
         assertNotNull(errorResponse.getTimestamp());
     }
 
@@ -61,9 +63,11 @@ class GlobalExceptionHandlerTest {
         
         ErrorResponse errorResponse = response.getBody();
         assertNotNull(errorResponse);
-        assertEquals(errorMessage, errorResponse.getMessage());
-        assertEquals("BAD_REQUEST", errorResponse.getCode());
-        assertEquals(requestUri, errorResponse.getPath());
+        assertEquals("about:blank", errorResponse.getType());
+        assertEquals("Bad Request", errorResponse.getTitle());
+        assertEquals(400, errorResponse.getStatus());
+        assertEquals(errorMessage, errorResponse.getDetail());
+        assertEquals(requestUri, errorResponse.getInstance());
         assertNotNull(errorResponse.getTimestamp());
     }
 
@@ -79,12 +83,16 @@ class GlobalExceptionHandlerTest {
         assertNotNull(response.getBody());
         ErrorResponse errorResponse = response.getBody();
         if (errorResponse != null) {
-            assertNull(errorResponse.getMessage());
+            assertEquals("about:blank", errorResponse.getType());
+            assertEquals("Internal Server Error", errorResponse.getTitle());
+            assertEquals(500, errorResponse.getStatus());
+            assertNull(errorResponse.getDetail());
+            assertEquals("/test", errorResponse.getInstance());
         }
     }
 
     @Test
-    void should_ReturnACCompliantResponse_When_GenericExceptionThrown() {
+    void should_ReturnRFC9457CompliantResponse_When_GenericExceptionThrown() {
         Exception exception = new Exception("Database connection failed");
         String requestPath = "/api/users/123";
 
@@ -95,14 +103,16 @@ class GlobalExceptionHandlerTest {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         ErrorResponse errorResponse = response.getBody();
         assertNotNull(errorResponse);
+        assertEquals("about:blank", errorResponse.getType());
+        assertEquals("Internal Server Error", errorResponse.getTitle());
+        assertEquals(500, errorResponse.getStatus());
+        assertEquals("Database connection failed", errorResponse.getDetail());
+        assertEquals(requestPath, errorResponse.getInstance());
         assertNotNull(errorResponse.getTimestamp());
-        assertEquals(requestPath, errorResponse.getPath());
-        assertEquals("INTERNAL_SERVER_ERROR", errorResponse.getCode());
-        assertEquals("Database connection failed", errorResponse.getMessage());
     }
 
     @Test
-    void should_ReturnACCompliantResponse_When_IllegalArgumentExceptionThrown() {
+    void should_ReturnRFC9457CompliantResponse_When_IllegalArgumentExceptionThrown() {
         IllegalArgumentException exception = new IllegalArgumentException("Invalid user ID");
         String requestPath = "/api/users/abc";
 
@@ -113,9 +123,11 @@ class GlobalExceptionHandlerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         ErrorResponse errorResponse = response.getBody();
         assertNotNull(errorResponse);
+        assertEquals("about:blank", errorResponse.getType());
+        assertEquals("Bad Request", errorResponse.getTitle());
+        assertEquals(400, errorResponse.getStatus());
+        assertEquals("Invalid user ID", errorResponse.getDetail());
+        assertEquals(requestPath, errorResponse.getInstance());
         assertNotNull(errorResponse.getTimestamp());
-        assertEquals(requestPath, errorResponse.getPath());
-        assertEquals("BAD_REQUEST", errorResponse.getCode());
-        assertEquals("Invalid user ID", errorResponse.getMessage());
     }
 }

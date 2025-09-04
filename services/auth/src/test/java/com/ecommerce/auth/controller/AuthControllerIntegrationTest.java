@@ -19,7 +19,7 @@ class AuthControllerIntegrationTest {
     private TestRestTemplate restTemplate;
 
     @Test
-    void should_ReturnACCompliantErrorResponse_When_ExceptionThrown() throws Exception {
+    void should_ReturnRFC9457CompliantErrorResponse_When_ExceptionThrown() throws Exception {
         String url = "http://localhost:" + port + "/error-endpoint";
 
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
@@ -27,9 +27,11 @@ class AuthControllerIntegrationTest {
         assertEquals(500, response.getStatusCode().value());
         String responseBody = response.getBody();
         assertNotNull(responseBody);
+        assertTrue(responseBody.contains("\"type\":\"about:blank\""));
+        assertTrue(responseBody.contains("\"title\":\"Internal Server Error\""));
+        assertTrue(responseBody.contains("\"status\":500"));
+        assertTrue(responseBody.contains("\"detail\":\"Test exception for global error handling\""));
+        assertTrue(responseBody.contains("\"instance\":\"/error-endpoint\""));
         assertTrue(responseBody.contains("\"timestamp\""));
-        assertTrue(responseBody.contains("\"path\":\"/error-endpoint\""));
-        assertTrue(responseBody.contains("\"code\":\"INTERNAL_SERVER_ERROR\""));
-        assertTrue(responseBody.contains("\"message\":\"Test exception for global error handling\""));
     }
 }

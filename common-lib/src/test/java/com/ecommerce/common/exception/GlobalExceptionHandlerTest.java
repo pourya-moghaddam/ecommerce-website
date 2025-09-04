@@ -41,8 +41,7 @@ class GlobalExceptionHandlerTest {
         ErrorResponse errorResponse = response.getBody();
         assertNotNull(errorResponse);
         assertEquals(errorMessage, errorResponse.getMessage());
-        assertEquals("Internal Server Error", errorResponse.getError());
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse.getStatus());
+        assertEquals("INTERNAL_SERVER_ERROR", errorResponse.getCode());
         assertEquals(requestUri, errorResponse.getPath());
         assertNotNull(errorResponse.getTimestamp());
     }
@@ -63,8 +62,7 @@ class GlobalExceptionHandlerTest {
         ErrorResponse errorResponse = response.getBody();
         assertNotNull(errorResponse);
         assertEquals(errorMessage, errorResponse.getMessage());
-        assertEquals("Bad Request", errorResponse.getError());
-        assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
+        assertEquals("BAD_REQUEST", errorResponse.getCode());
         assertEquals(requestUri, errorResponse.getPath());
         assertNotNull(errorResponse.getTimestamp());
     }
@@ -72,16 +70,52 @@ class GlobalExceptionHandlerTest {
     @Test
     void testHandleExceptionWithNullMessage() {
         Exception exception = new Exception();
-        
+
         when(webRequest.getDescription(false)).thenReturn("uri=/test");
-        
+
         ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleGenericException(exception, webRequest);
-        
+
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNotNull(response.getBody());
         ErrorResponse errorResponse = response.getBody();
         if (errorResponse != null) {
             assertNull(errorResponse.getMessage());
         }
+    }
+
+    @Test
+    void should_ReturnACCompliantResponse_When_GenericExceptionThrown() {
+        Exception exception = new Exception("Database connection failed");
+        String requestPath = "/api/users/123";
+
+        when(webRequest.getDescription(false)).thenReturn("uri=" + requestPath);
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleGenericException(exception, webRequest);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        ErrorResponse errorResponse = response.getBody();
+        assertNotNull(errorResponse);
+        assertNotNull(errorResponse.getTimestamp());
+        assertEquals(requestPath, errorResponse.getPath());
+        assertEquals("INTERNAL_SERVER_ERROR", errorResponse.getCode());
+        assertEquals("Database connection failed", errorResponse.getMessage());
+    }
+
+    @Test
+    void should_ReturnACCompliantResponse_When_IllegalArgumentExceptionThrown() {
+        IllegalArgumentException exception = new IllegalArgumentException("Invalid user ID");
+        String requestPath = "/api/users/abc";
+
+        when(webRequest.getDescription(false)).thenReturn("uri=" + requestPath);
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleIllegalArgument(exception, webRequest);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        ErrorResponse errorResponse = response.getBody();
+        assertNotNull(errorResponse);
+        assertNotNull(errorResponse.getTimestamp());
+        assertEquals(requestPath, errorResponse.getPath());
+        assertEquals("BAD_REQUEST", errorResponse.getCode());
+        assertEquals("Invalid user ID", errorResponse.getMessage());
     }
 }

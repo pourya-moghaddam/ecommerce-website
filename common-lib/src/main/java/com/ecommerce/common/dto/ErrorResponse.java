@@ -9,11 +9,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ErrorResponse {
 
-    private String message;
-    private String error;
-    private int status;
     private LocalDateTime timestamp;
     private String path;
+    private String code;
+    private String message;
+
+    private String error;
+    private int status;
+
+    public ErrorResponse(String message, String code, String path) {
+        this.message = message;
+        this.code = code;
+        this.path = path;
+        this.timestamp = LocalDateTime.now();
+    }
 
     public ErrorResponse(String message, String error, int status, String path) {
         this.message = message;

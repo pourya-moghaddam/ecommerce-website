@@ -11,4 +11,9 @@ public class AuthController {
         return "Auth service is running!";
     }
 
+    @GetMapping("/error-endpoint")
+    public String errorEndpoint() {
+        throw new RuntimeException("Test exception for global error handling");
+    }
+
 }

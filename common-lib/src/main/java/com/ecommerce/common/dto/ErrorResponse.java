@@ -9,17 +9,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ErrorResponse {
 
-    private String message;
-    private String error;
+    private String type;
+    private String title;
     private int status;
+    private String detail;
+    private String instance;
     private LocalDateTime timestamp;
-    private String path;
 
-    public ErrorResponse(String message, String error, int status, String path) {
-        this.message = message;
-        this.error = error;
+    public ErrorResponse(String type, String title, int status, String detail, String instance) {
+        this.type = type;
+        this.title = title;
         this.status = status;
-        this.path = path;
+        this.detail = detail;
+        this.instance = instance;
         this.timestamp = LocalDateTime.now();
     }
 }
